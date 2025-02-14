@@ -1,0 +1,71 @@
+"use client";
+
+import React, { useEffect, useState} from "react";
+import styled from "styled-components";
+import DOMPurify from "dompurify";
+import {EMPTY_STRING, TICKETS_PARAMS, USER_TYPE} from "@/app/components/constants/consts";
+import { useSearchParams } from "next/navigation";
+import { useGetTickets } from "@/app/components/use_get_tickets";
+import { useInView } from "react-intersection-observer";
+import { UserType } from "@/app/types/ticket";
+import SearchInputBox from "@/app/components/search_input_box";
+import Skeleton from "@/app/components/skeleton";
+import Tickets from "@/app/components/tickets";
+import useDebouncedValue from "@/app/components/useDebouncedValue";
+import UserTypeDropdown from "@/app/components/user_type_dropdown";
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+`;
+
+const HeadWrapper = styled.div`
+    display: flex;
+    gap: 16px;
+`;
+
+const NoResultsMessage = styled.div`
+    font-size: 18px;
+`;
+
+const App = () => {
+    const searchParams = useSearchParams();
+    const { ref, inView } = useInView({ threshold: 1.0 });
+    const [searchInput, setSearchInput] = useState(EMPTY_STRING);
+    const sanitizedSearch = typeof window !== "undefined" ? DOMPurify.sanitize(searchInput) : searchInput;
+    const debouncedSearch = useDebouncedValue(sanitizedSearch, 500);
+    const userType = (searchParams.get(TICKETS_PARAMS.USER_TYPE) as UserType) || USER_TYPE.LOCAL;
+
+    const { tickets, hasMore, isLoading, isError, setSize } = useGetTickets(debouncedSearch);
+
+    useEffect(() => {
+        if (inView && hasMore && !isLoading) {
+            setSize(prevSize => prevSize + 1).catch(() => {});
+        }
+    }, [inView, hasMore, isLoading, setSize]);
+
+    const showSkeleton = isLoading && !tickets.length;
+    const noResults = !isLoading && !tickets.length;
+
+    return (
+        <Container>
+            <HeadWrapper>
+                <UserTypeDropdown userType={userType}/>
+                <SearchInputBox setSearchInput={setSearchInput} />
+            </HeadWrapper>
+            { showSkeleton ? (
+                <Skeleton />
+            ) : noResults ? (
+                <NoResultsMessage>No ticket events found.</NoResultsMessage>
+            ) : isError ? (
+                <div>Failed to load tickets. Please try again.</div>
+            ) : (
+                <Tickets tickets={tickets} userType={userType} />
+            )}
+            <div ref={ref} style={{ height: 20, background: "transparent" }}></div>
+        </Container>
+    );
+};
+
+export default App;
