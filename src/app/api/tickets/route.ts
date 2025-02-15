@@ -34,7 +34,7 @@ const paginateTickets = (tickets: Ticket[], page: number) => {
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
-    const page = Math.max(parseInt(searchParams.get(TICKETS_PARAMS.PAGE) || "1", 10), 1);
+    const page = Math.max(parseInt(searchParams.get(TICKETS_PARAMS.PAGE) || "1", PAGE_SIZE), 1);
     const search = searchParams.get(TICKETS_PARAMS.SEARCH_INPUT)?.toLowerCase() || EMPTY_STRING;
 
     return NextResponse.json(paginateTickets(filterTickets(search), page));
