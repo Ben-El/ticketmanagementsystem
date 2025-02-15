@@ -1,7 +1,6 @@
 export const PAGE_SIZE = 10;
 export const EMPTY_STRING = "";
 export const THREE_DOTS = "...";
-export const UNDEFINED = "undefined";
 export const TICKETS_PARAMS = {
     PAGE: "page",
     USER_TYPE: "userType",

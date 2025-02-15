@@ -1,9 +1,9 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import DOMPurify from "dompurify";
-import {EMPTY_STRING, TICKETS_PARAMS, UNDEFINED, USER_TYPE} from "@/app/components/constants/consts";
+import {EMPTY_STRING, TICKETS_PARAMS, USER_TYPE} from "@/app/components/constants/consts";
 import { useSearchParams } from "next/navigation";
 import { useGetTickets } from "@/app/components/use_get_tickets";
 import { useInView } from "react-intersection-observer";
@@ -33,19 +33,27 @@ const App = () => {
     const searchParams = useSearchParams();
     const { ref, inView } = useInView({ threshold: 1.0 });
     const [searchInput, setSearchInput] = useState(EMPTY_STRING);
-    const sanitizedSearch = typeof window !== UNDEFINED ? DOMPurify.sanitize(searchInput) : searchInput;
+    const [sanitizedSearch, setSanitizedSearch] = useState(EMPTY_STRING);
     const debouncedSearch = useDebouncedValue(sanitizedSearch, 500);
     const userType = (searchParams.get(TICKETS_PARAMS.USER_TYPE) as UserType) || USER_TYPE.LOCAL;
 
     const { tickets, hasMore, isLoading, isError, setSize } = useGetTickets(debouncedSearch);
 
-    const shouldLoadMore = useMemo(() => inView && hasMore && !isLoading, [inView, hasMore, isLoading]);
     const showSkeleton = isLoading && !tickets.length;
     const noResults = !isLoading && !tickets.length;
 
     useEffect(() => {
-        if (shouldLoadMore) setSize(prev => prev + 1).catch(() => {});
-    }, [shouldLoadMore, setSize]);
+        setSanitizedSearch(prev => {
+            const cleanInput = DOMPurify.sanitize(searchInput);
+            return prev !== cleanInput ? cleanInput : prev;
+        });
+    }, [searchInput]);
+
+    useEffect(() => {
+        if (inView && hasMore && !isLoading) {
+            setSize(prev => prev + 1).catch(() => {});
+        }
+    }, [inView, hasMore, isLoading, setSize]);
 
     return (
         <Container>
