@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import styled from "styled-components";
 import DOMPurify from "dompurify";
 import {EMPTY_STRING, TICKETS_PARAMS, UNDEFINED, USER_TYPE} from "@/app/components/constants/consts";
@@ -39,14 +39,13 @@ const App = () => {
 
     const { tickets, hasMore, isLoading, isError, setSize } = useGetTickets(debouncedSearch);
 
-    useEffect(() => {
-        if (inView && hasMore && !isLoading) {
-            setSize(prevSize => prevSize + 1).catch(() => {});
-        }
-    }, [inView, hasMore, isLoading, setSize]);
-
+    const shouldLoadMore = useMemo(() => inView && hasMore && !isLoading, [inView, hasMore, isLoading]);
     const showSkeleton = isLoading && !tickets.length;
     const noResults = !isLoading && !tickets.length;
+
+    useEffect(() => {
+        if (shouldLoadMore) setSize(prev => prev + 1).catch(() => {});
+    }, [shouldLoadMore, setSize]);
 
     return (
         <Container>

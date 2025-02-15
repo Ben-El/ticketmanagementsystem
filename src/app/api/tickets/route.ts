@@ -1,8 +1,8 @@
 import { Ticket } from "@/app/types/ticket";
 import { NextResponse } from "next/server";
-import {PAGE_SIZE, TICKETS_PARAMS, EMPTY_STRING} from "@/app/components/constants/consts";
+import { PAGE_SIZE, TICKETS_PARAMS, EMPTY_STRING } from "@/app/components/constants/consts";
 
-const generateTickets = (count: number) =>
+const generateTickets = (count: number): Ticket[] =>
     Array.from({ length: count }, (__, i) => i + 1).map(i => ({
         id: `${i}`,
         title: `Event ticket ${i}`,
@@ -14,26 +14,27 @@ const generateTickets = (count: number) =>
 
 const tickets: Ticket[] = generateTickets(150);
 
-export async function GET(req: Request) {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get(TICKETS_PARAMS.PAGE) || "1");
-    const search = searchParams.get(TICKETS_PARAMS.SEARCH_INPUT)?.toLowerCase() || EMPTY_STRING;
-
-    let filteredTickets = tickets;
-
-    if (search) {
-        filteredTickets = filteredTickets.filter(ticket =>
+const filterTickets = (search: string): Ticket[] =>
+    search
+        ? tickets.filter(ticket =>
             ticket.title.toLowerCase().includes(search) ||
             ticket.description.toLowerCase().includes(search)
-        );
-    }
+        )
+        : tickets;
 
+const paginateTickets = (tickets: Ticket[], page: number) => {
     const startIndex = (page - 1) * PAGE_SIZE;
-    const paginatedTickets = filteredTickets.slice(startIndex, startIndex + PAGE_SIZE);
+    return {
+        tickets: tickets.slice(startIndex, startIndex + PAGE_SIZE),
+        hasMore: startIndex + PAGE_SIZE < tickets.length,
+        total: tickets.length,
+    };
+};
 
-    return NextResponse.json({
-        tickets: paginatedTickets,
-        total: filteredTickets.length,
-        hasMore: startIndex + PAGE_SIZE < filteredTickets.length,
-    });
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(parseInt(searchParams.get(TICKETS_PARAMS.PAGE) || "1", 10), 1);
+    const search = searchParams.get(TICKETS_PARAMS.SEARCH_INPUT)?.toLowerCase() || EMPTY_STRING;
+
+    return NextResponse.json(paginateTickets(filterTickets(search), page));
 }

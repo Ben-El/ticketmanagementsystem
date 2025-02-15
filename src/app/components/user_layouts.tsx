@@ -1,31 +1,12 @@
 import React from "react";
-import styled from "styled-components";
 import { UserType } from "@/app/types/ticket";
 import {USER_TYPE} from "@/app/components/constants/consts";
-
-const DefaultLayout = styled.div``;
+import {BlaStyle, DefaultStyle, LocalStyle, TouristStyle} from "@/app/components/user_styles";
 
 const UserLayouts: Record<UserType, React.ElementType> = {
-    [USER_TYPE.LOCAL]: styled.div`
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 16px;
-    `,
-    [USER_TYPE.TOURIST]: styled.div`
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-
-        & > div {
-            max-width: 200px;
-            width: 100%;
-        }
-    `,
-    [USER_TYPE.BLA]: styled.div`
-        display: flex;
-        flex-direction: column;
-        gap: 156px;
-    `,
+    [USER_TYPE.LOCAL]: LocalStyle,
+    [USER_TYPE.TOURIST]: TouristStyle,
+    [USER_TYPE.BLA]: BlaStyle,
 };
 
-export const getUserLayout = (userType: UserType) => UserLayouts[userType] || DefaultLayout;
+export const getUserLayout = (userType: UserType) => UserLayouts[userType] || DefaultStyle;
