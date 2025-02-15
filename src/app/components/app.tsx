@@ -36,7 +36,7 @@ const App = () => {
 
     const { tickets, hasMore, isLoading, isError, setSize } = useGetTickets(debouncedSearch);
 
-    const showSkeleton = isLoading && !tickets.length && !searchInput;
+    const showSkeleton = isLoading && !tickets.length && !debouncedSearch;
     const noResults = !isLoading && !tickets.length;
 
     useEffect(() => {
