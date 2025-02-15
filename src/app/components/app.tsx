@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import styled from "styled-components";
 import DOMPurify from "dompurify";
 import {EMPTY_STRING, TICKETS_PARAMS, USER_TYPE} from "@/app/components/constants/consts";
+import {FAILED_LOAD_TICKETS, Message, NO_TICKETS_FOUND} from "@/app/components/constants/messages";
 import { useSearchParams } from "next/navigation";
 import { useGetTickets } from "@/app/components/use_get_tickets";
 import { useInView } from "react-intersection-observer";
@@ -23,10 +24,6 @@ const Container = styled.div`
 const HeadWrapper = styled.div`
     display: flex;
     gap: 16px;
-`;
-
-const NoResultsMessage = styled.div`
-    font-size: 18px;
 `;
 
 const App = () => {
@@ -64,9 +61,9 @@ const App = () => {
             { showSkeleton ? (
                 <Skeleton />
             ) : noResults ? (
-                <NoResultsMessage>No ticket events found.</NoResultsMessage>
+                <Message>{NO_TICKETS_FOUND}</Message>
             ) : isError ? (
-                <div>Failed to load tickets. Please try again.</div>
+                <Message>{FAILED_LOAD_TICKETS}</Message>
             ) : (
                 <Tickets tickets={tickets} userType={userType} />
             )}
