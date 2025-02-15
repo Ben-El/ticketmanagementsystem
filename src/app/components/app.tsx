@@ -3,7 +3,7 @@
 import React, { useEffect, useState} from "react";
 import styled from "styled-components";
 import DOMPurify from "dompurify";
-import {EMPTY_STRING, TICKETS_PARAMS, USER_TYPE} from "@/app/components/constants/consts";
+import {EMPTY_STRING, TICKETS_PARAMS, UNDEFINED, USER_TYPE} from "@/app/components/constants/consts";
 import { useSearchParams } from "next/navigation";
 import { useGetTickets } from "@/app/components/use_get_tickets";
 import { useInView } from "react-intersection-observer";
@@ -33,7 +33,7 @@ const App = () => {
     const searchParams = useSearchParams();
     const { ref, inView } = useInView({ threshold: 1.0 });
     const [searchInput, setSearchInput] = useState(EMPTY_STRING);
-    const sanitizedSearch = typeof window !== "undefined" ? DOMPurify.sanitize(searchInput) : searchInput;
+    const sanitizedSearch = typeof window !== UNDEFINED ? DOMPurify.sanitize(searchInput) : searchInput;
     const debouncedSearch = useDebouncedValue(sanitizedSearch, 500);
     const userType = (searchParams.get(TICKETS_PARAMS.USER_TYPE) as UserType) || USER_TYPE.LOCAL;
 
