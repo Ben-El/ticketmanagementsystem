@@ -1,13 +1,14 @@
 import { Ticket } from "@/app/types/ticket";
 import { NextResponse } from "next/server";
 import { PAGE_SIZE, TICKETS_PARAMS, EMPTY_STRING } from "@/app/components/constants/consts";
+import {getTodayDate} from "@/app/components/utils";
 
 const generateTickets = (count: number): Ticket[] =>
     Array.from({ length: count }, (__, i) => i + 1).map(i => ({
         id: `${i}`,
         title: `Event ticket ${i}`,
         description: `Description for event ${i}. This is a very nice description, a very lovely one.`,
-        date: new Date().toISOString().split("T")[0],
+        date: getTodayDate(),
         location: `Location ${i}`,
         image: `https://picsum.photos/200/200?random=${i}`,
     }));
