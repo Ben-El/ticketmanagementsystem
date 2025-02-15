@@ -13,7 +13,6 @@ const SearchInputBox = ({ setSearchInput }: { setSearchInput: (value: string) =>
         type="text"
         placeholder="Search by title or description..."
         onChange={({ target }) => setSearchInput(target.value)}
-        style={{ width: "300px", padding: "8px", border: "1px solid #ccc", borderRadius: "4px" }}
     />
 );
 
