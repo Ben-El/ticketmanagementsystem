@@ -62,7 +62,7 @@ const App = () => {
             ) : (
                 <Tickets tickets={tickets} userType={userType} />
             )}
-            <div ref={ref} style={{ height: 20, background: "transparent" }}></div>
+            <div ref={ref}></div>
         </Container>
     );
 };
